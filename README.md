@@ -1,3 +1,8 @@
+You can find the steps for the installation in installation_guide.txt
+Puedes encontrar los pasos para la instalacion en el txt guia_instalacion.txt
+
+
+
 Project created by "Mar" with the help of Claude Sonnet 4.6 through Google's Antigravity IDE. This project
 is not intended to be commercial or serious — it is a personal project for learning and fun.
 The design, ideas, implementations, resources, and features are the author's own suggestions. Libraries,
