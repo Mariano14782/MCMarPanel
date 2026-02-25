@@ -18,6 +18,9 @@ It allows real-time server control via RCON, viewing connected players,
 sending commands, global or player-specific messages, and monitoring
 connection status.
 
+<img width="1211" height="632" alt="image" src="https://github.com/user-attachments/assets/80c44dc1-ee81-4722-8c0e-7c8fa216a3ea" />
+
+
 TECHNOLOGY STACK
 -----------------
   Backend  : Node.js 20 + Express + WebSocket (ws)
