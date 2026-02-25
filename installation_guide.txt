@@ -1,0 +1,257 @@
+================================================================
+  MCPANEL — UBUNTU SERVER INSTALLATION GUIDE
+  Generated: 02/25/2026
+================================================================
+
+SYSTEM REQUIREMENTS
+--------------------
+
+  Operating system  : Ubuntu 20.04 LTS or higher
+                      (also compatible with Debian 11+)
+  Minimum RAM       : 512 MB (1 GB+ recommended)
+  Disk              : 1 GB free
+  Access            : User with sudo
+  Network           : Internet access to download Docker and
+                      the base image node:20-alpine
+
+  MINECRAFT SERVER (on the same machine or on the network):
+    - Minecraft Java Edition with RCON enabled
+    - server.properties must have:
+        enable-rcon=true
+        rcon.port=25575
+        rcon.password=YOUR_PASSWORD_HERE
+    - Port 25575 (RCON) accessible from the server where
+      Docker is installed.
+
+  IMPORTANT — if MC is on the SAME machine as Docker:
+    During configuration, use "host-gateway" as RCON_HOST
+    instead of "localhost" or the local IP. This is necessary
+    because Docker containers cannot reach the host's localhost
+    directly.
+
+
+STEP 1 — INSTALL DOCKER
+------------------------
+
+  Run as a user with sudo:
+
+    curl -fsSL https://get.docker.com | sh
+    sudo usermod -aG docker $USER
+    newgrp docker
+
+  Verify installation:
+
+    docker --version
+    docker compose version
+
+  Both commands should return a version number.
+  If "docker compose version" fails, install the plugin:
+
+    sudo apt-get install docker-compose-plugin
+
+
+STEP 2 — INSTALL MCRCON FOR PANEL CONNECTION
+---------------------------------------------
+
+  Run as a user with sudo:
+
+    sudo apt-get install mcrcon
+
+  Verify installation:
+
+    mcrcon --version
+
+  Enable mcrcon in server.properties:
+    
+    enable-rcon=true
+    rcon.port=25575
+    rcon.password=YOUR_PASSWORD_HERE
+
+STEP 3 — COPY FILES TO THE SERVER
+-----------------------------------
+
+  Option A — From another PC via SCP:
+    scp -r ./docker user@SERVER-IP:~/mcpanel
+
+  Option B — Connected directly to the server:
+    Copy the "MCMarPanel" folder to the server by
+    any means (USB, SFTP, etc.)
+
+  Option C — If you have Git:
+    git clone https://github.com/your-user/mcpanel.git ~/mcpanel
+    cd ~/mcpanel/docker
+
+  Expected result on the server:
+    ~/mcpanel/   
+    |-- server.js
+    |-- package.json
+    |-- Dockerfile
+    |-- docker-compose.yml
+    |-- setup.sh
+    |-- .env.example
+    |-- DEPLOY.md
+    |-- public/
+
+
+STEP 4 — RUN THE CONFIGURATION WIZARD
+---------------------------------------
+
+  Navigate to the folder and start the wizard:
+
+    cd ~/mcpanel
+    bash setup.sh
+
+  The menu will show the current configuration with default
+  values. Available options:
+
+    1) Edit configuration
+    2) Save and deploy
+    3) Save .env only
+    4) View container logs
+    5) Stop container
+    6) Exit
+
+
+STEP 5 — CONFIGURE VARIABLES
+------------------------------
+
+  Select option 1 to edit. Press ENTER to accept the current
+  value shown in brackets [].
+
+  Variables to configure:
+
+  PORT
+    Port where the panel will be available.
+    Default: 3007
+    Example: 3007
+    Note: Make sure this port is open in the firewall.
+
+  RCON_HOST
+    IP or hostname of the Minecraft server for RCON.
+    - If MC is on the SAME machine: enter "host-gateway"
+    - If MC is on ANOTHER machine: enter its IP (e.g.: 192.168.1.100)
+
+  RCON_PORT
+    RCON port of the Minecraft server.
+    Default: 25575
+    Must match rcon.port in MC's server.properties.
+
+  RCON_PASSWORD
+    RCON password.
+    Must match rcon.password in MC's server.properties.
+
+  MC_LOCAL_HOST
+    IP of the MC server to display the local status badge.
+    Can be the same as RCON_HOST or a different IP.
+
+  MC_LOCAL_PORT
+    TCP port of the Minecraft server (not RCON, the game port).
+    Default: 25565
+
+  MC_EXT_HOST
+    Public domain or IP of the server for the external badge.
+    Example: play.myserver.com or 203.0.113.10
+
+  MC_EXT_PORT
+    External port of the MC server.
+    Default: 25565
+
+
+STEP 6 — DEPLOY
+----------------
+
+  Select option 2 "Save and deploy".
+
+  The script will automatically:
+    1. Save the configuration to .env
+    2. Build the Docker image
+    3. Start the container in the background
+    4. Display the access URL
+
+
+STEP 7 — VERIFY
+----------------
+
+  Open in your browser:
+    http://SERVER-IP:3007
+
+  If the panel loads and the top indicator says "Online",
+  the installation was successful.
+
+  To view logs in real time:
+    bash setup.sh  -> option 4
+    Or directly: docker logs -f mcpanel
+
+
+FIREWALL (if the panel doesn't load from another PC)
+------------------------------------------------------
+
+  Open the panel port on Ubuntu:
+
+    sudo ufw allow 3007/tcp
+    sudo ufw reload
+
+  Verify that ufw is active:
+
+    sudo ufw status
+
+
+USEFUL POST-INSTALLATION COMMANDS
+-----------------------------------
+
+  Check container status:
+    docker ps
+
+  View live logs:
+    docker logs -f mcpanel
+
+  Stop the panel:
+    docker stop mcpanel
+
+  Start again (without rebuilding):
+    docker start mcpanel
+
+  Update after code changes:
+    bash setup.sh  -> option 2
+    (this rebuilds the image with the new files)
+
+  Completely uninstall:
+    docker compose down
+    docker rmi mcpanel:latest
+
+
+CONFIGURATION UPDATE
+---------------------
+
+  If you need to change IPs, ports, or password:
+
+    bash setup.sh
+    -> Option 1 (edit)
+    -> Option 2 (save and deploy)
+
+  The container will restart automatically with the new config.
+
+
+TROUBLESHOOTING
+----------------
+
+  "RCON not connected" in the panel console:
+    - Verify that enable-rcon=true in MC's server.properties
+    - Verify that RCON_PASSWORD is correct
+    - If MC is on the same machine: RCON_HOST must be "host-gateway"
+    - Restart the Minecraft server after changing server.properties
+
+  The panel doesn't load in the browser:
+    - Verify that the container is running: docker ps
+    - Verify that the port is open: sudo ufw status
+    - Check logs: docker logs mcpanel
+
+  Error building the image:
+    - Verify internet connection (downloads node:20-alpine)
+    - Verify that all files in the mcpanel/ folder exist
+
+  "': not a valid identifier" when running setup.sh:
+    - This means the file has Windows line endings (CRLF),
+      try downloading another version of mcpanel. (my mistake)
+
+================================================================

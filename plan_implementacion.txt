@@ -1,0 +1,124 @@
+================================================================
+  MCMarPANEL — PLAN DE IMPLEMENTACION
+  Generado: 25/02/2026
+================================================================
+
+DESCRIPCION DEL PROYECTO
+------------------------
+Proyecto realizado por "Mar" con ayuda de Claude Sonnet 4.6 por medio del IDE Antigravity de google, este proyecto no
+pretende ser comercial, ni serio, solo es un proyecto personal por aprendizaje y diversión.
+El diseño, ideas, implementaciones, recursos y funcionalidades son sugerencias propias del autor. Mientras que las librerias, codigos y tecnologias 
+utilizadas fueron implementadas por Claude Sonnet 4.6 en funcion de agente por Antigravity.
+
+Mi conocimiento es limitado en programacion y diseño web, a lo que recurrí al modelo Claude Sonnet 4.6, por lo que no puedo garantizar 
+que el proyecto sea funcional al 100% o seguro.
+
+MCMarPanel es un dashboard web de administracion para servidores
+Minecraft. Permite controlar el servidor en tiempo real mediante
+RCON, visualizar jugadores conectados, enviar comandos, mensajes
+globales o a jugadores, y monitorear el estado de conexion.
+
+STACK TECNOLOGICO
+-----------------
+  Backend  : Node.js 20 + Express + WebSocket (ws)
+  Protocolo: RCON via rcon-client
+  Frontend : HTML + CSS + JavaScript vanilla (sin frameworks)
+  Fuentes  : JetBrains Mono, Inter (Google Fonts)
+  Docker   : node:20-alpine + Docker Compose
+
+
+ESTRUCTURA DEL PROYECTO (dentro de docker/)
+--------------------------------------------
+  docker/
+  |-- server.js            Backend principal
+  |-- package.json         Dependencias Node.js
+  |-- package-lock.json    Lockfile de dependencias
+  |-- Dockerfile           Imagen Docker de produccion
+  |-- docker-compose.yml   Orquestacion del contenedor
+  |-- .dockerignore        Exclusiones del contexto Docker
+  |-- .env.example         Plantilla de variables de entorno
+  |-- setup.sh             Script de instalacion interactivo
+  |-- DEPLOY.md            Guia de despliegue
+  |-- public/
+      |-- index.html       Interfaz del panel
+      |-- css/style.css    Estilos del panel
+      |-- js/app.js        Logica del frontend
+
+
+VARIABLES DE CONFIGURACION
+--------------------------
+  PORT             Puerto donde el panel es accesible (default: 3007)
+
+  RCON_HOST        IP o hostname del servidor Minecraft para RCON
+                   Si MC corre en la misma maquina que Docker: host-gateway
+                   Si MC corre en otra maquina: IP de esa maquina
+
+  RCON_PORT        Puerto RCON del servidor MC (default: 25575)
+
+  RCON_PASSWORD    Contrasena RCON configurada en server.properties
+
+  MC_LOCAL_HOST    IP local del servidor MC (para ping de estado)
+
+  MC_LOCAL_PORT    Puerto del servidor MC (default: 25565)
+
+  MC_EXT_HOST      Dominio o IP publica del servidor MC
+
+  MC_EXT_PORT      Puerto externo del servidor MC (default: 25565)
+
+  Todas estas variables son configuradas interactivamente por setup.sh
+  y guardadas en docker/.env antes del despliegue.
+
+  #fue una idea que tuve antes al momento de implementar docker por lo que su funcionamiento puede no ser optimo ni confiable de funcionamiento al 100%.
+  #El script setup.sh es interactivo y te guia paso a paso para configurar el panel. (puede que en un futuro lo implemente directamente en el panel).
+  #Todo esto se probó en mi homelab personal donde corro mi servidor MC, con ubuntu server 24.04.4 LTS.
+
+
+ENDPOINTS DEL BACKEND
+---------------------
+  GET  /api/status         Estado RCON y jugadores actuales
+  GET  /api/players        Lista de jugadores online
+  POST /api/command        Ejecutar comando RCON arbitrario
+  GET  /api/logs           Historial de logs en memoria (max 200)
+  GET  /api/ping-servers   Ping TCP a servidor local y externo
+  POST /api/restart        Enviar "stop" al servidor MC
+  POST /api/tell           Enviar mensaje a jugador o a todos
+
+  WebSocket en /           Emite eventos en tiempo real:
+    history   -> logs anteriores al conectar
+    log       -> nueva linea de log
+    players   -> lista actualizada de jugadores
+    count     -> conteo de jugadores + lastConnected
+    rcon_status -> estado de la conexion RCON
+
+
+INDICADOR DE ESTADO (esquina superior derecha)
+----------------------------------------------
+  Verde "En linea"    -> WebSocket del panel conectado
+  Rojo "Sin conexion" -> WebSocket desconectado o panel caido
+
+  NOTA: Este indicador refleja si el PANEL esta funcionando,
+  NO el estado de RCON ni del servidor Minecraft.
+  Los badges de IP local/externa en la tarjeta de host
+  si muestran si el servidor MC responde por TCP.
+
+
+CONSIDERACIONES DE RED EN DOCKER
+---------------------------------
+  Los contenedores Docker tienen red aislada (bridge por defecto).
+  Para alcanzar servicios en la misma maquina host:
+    - Usar RCON_HOST=host-gateway
+    - docker-compose.yml incluye extra_hosts: host-gateway:host-gateway
+      lo que resuelve ese alias a la IP real del host automaticamente.
+  Para alcanzar otras maquinas de la LAN: usar su IP directamente.
+  El trafico externo (internet) sale normalmente por NAT del host.
+
+
+COMPATIBILIDAD CSS APLICADA
+----------------------------
+  -webkit-user-select    : none  (Safari 3+, iOS 3+)
+  -webkit-optimize-contrast      (Edge legacy para pixelart)
+  -webkit-fit-content            (Safari para width: fit-content)
+  -webkit-backdrop-filter        (Safari para blur en modal)
+  -webkit-animation              (Safari para animacion pulse)
+
+================================================================

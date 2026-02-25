@@ -1,0 +1,70 @@
+================================================================
+  MCPANEL — EXECUTION PLAN
+  Generated: 02/25/2026
+================================================================
+
+COMPLETED PHASES
+-----------------
+
+[PHASE 1] PANEL DEVELOPMENT
+  [x] Node.js backend with Express + WebSocket
+  [x] Persistent RCON connection with automatic reconnection
+  [x] Player polling every 10s (only notifies on changes)
+  [x] TCP ping to local and external server every 30s
+  [x] REST API: /api/status, /api/command, /api/tell,
+                /api/restart, /api/ping-servers, /api/logs
+  [x] HTML/CSS/JS vanilla frontend, premium dark design
+  [x] Real-time status indicator via WebSocket
+  [x] Command console with history
+  [x] Player card with avatars (crafatar.com)
+  [x] Player actions: kick, ban, gamemode, tp
+  [x] Global or player-specific messaging
+  [x] Controls: difficulty, weather, save, stop, restart
+  [x] Toast system and confirmation modals
+
+[PHASE 2] CSS COMPATIBILITY
+  [x] -webkit-user-select (Safari 3+, iOS 3+)
+  [x] -webkit-optimize-contrast (legacy Edge)
+  [x] -webkit-fit-content, -webkit-backdrop-filter, etc.
+
+[PHASE 3] DOCKERIZATION
+  [x] Dockerfile with node:20-alpine, production-only deps
+  [x] .dockerignore for clean image
+  [x] docker-compose.yml with restart: unless-stopped
+  [x] Environment variables via .env (not hardcoded)
+  [x] extra_hosts: host-gateway for host access from container
+  [x] server.js updated to read from process.env with fallbacks
+
+[PHASE 4] INSTALLATION SCRIPT
+  [x] Interactive setup.sh with Bash menu
+  [x] Loads current .env values as defaults
+  [x] Allows editing all connection variables
+  [x] Saves .env and runs docker compose up -d --build
+  [x] Additional options: logs, stop container
+  [x] Files written with LF (Unix) for Ubuntu compatibility
+  [x] ASCII-only (no Unicode) for maximum terminal compatibility
+
+[PHASE 5] ORGANIZATION
+  [x] Everything self-contained inside mcpanel/
+  [x] Only need to copy mcpanel/ to the Ubuntu server
+  [x] DEPLOY.md with complete step-by-step guide
+
+
+RUNTIME DATA FLOW
+------------------
+
+  [Browser] <--> [WebSocket] <--> [server.js (Node.js)]
+                                        |
+                            +-----------+----------+
+                            |                      |
+                    [RCON client]          [TCP Ping]
+                            |              |        |
+                    [MC Server]      [MC local]  [MC ext]
+                    :25575 RCON      :25565 TCP   :25565 TCP
+
+  1. The browser opens a WebSocket to the panel
+  2. The panel sends log history and current state
+  3. Every 10s: panel sends RCON "list" and emits players if changed
+  4. Every 30s: browser calls /api/ping-servers, panel does TCP ping
+  5. Each user command -> /api/command -> RCON -> response
+  6. If RCON disconnects -> automatic reconnection in 5s
