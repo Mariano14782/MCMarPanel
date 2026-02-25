@@ -77,9 +77,6 @@ PASO 3 — COPIAR ARCHIVOS AL SERVIDOR
     Copia la carpeta "MCMarPanel" completa al servidor por
     cualquier medio (USB, SFTP, etc.)
 
-  Opcion C — Si tienes Git:
-    git clone https://github.com/tu-usuario/mcpanel.git ~/mcpanel
-    cd ~/mcpanel/docker
 
   Resultado esperado en el servidor:
     ~/mcpanel/   
@@ -254,3 +251,4 @@ SOLUCION DE PROBLEMAS
     - Significa que el archivo tiene saltos de linea Windows (CRLF), intenta descargar otra version de mcpanel. (error mio)
 
 ================================================================
+
