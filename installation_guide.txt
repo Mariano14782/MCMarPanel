@@ -67,19 +67,7 @@ STEP 2 — INSTALL MCRCON FOR PANEL CONNECTION
     rcon.port=25575
     rcon.password=YOUR_PASSWORD_HERE
 
-STEP 3 — COPY FILES TO THE SERVER
------------------------------------
 
-  Option A — From another PC via SCP:
-    scp -r ./docker user@SERVER-IP:~/mcpanel
-
-  Option B — Connected directly to the server:
-    Copy the "MCMarPanel" folder to the server by
-    any means (USB, SFTP, etc.)
-
-  Option C — If you have Git:
-    git clone https://github.com/your-user/mcpanel.git ~/mcpanel
-    cd ~/mcpanel/docker
 
   Expected result on the server:
     ~/mcpanel/   
