@@ -1,0 +1,14 @@
+services:
+  mcpanel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcpanel:latest
+    container_name: mcpanel
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${PORT:-3007}:${PORT:-3007}"
+    extra_hosts:
+      - "host-gateway:host-gateway"
