@@ -1,3 +1,5 @@
+THIS IS MY FIRST CONTRIBUTION, I´M SORRY IF IT´S NOT WHAT IT´S SUPPOSED TO BE
+
 You can find the steps for the installation in installation_guide.txt
 Puedes encontrar los pasos para la instalacion en el txt guia_instalacion.txt
 
